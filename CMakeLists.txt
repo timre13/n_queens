@@ -82,8 +82,8 @@ ADD_EXECUTABLE(n_queens
     src/InputWindowContent.cpp
     src/OutputWindowContent.h
     src/OutputWindowContent.cpp
-    src/Table.h
-    src/Table.cpp
+    src/Board.h
+    src/Board.cpp
     src/Queen.h
     src/config.h
 )

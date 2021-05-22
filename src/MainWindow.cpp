@@ -14,11 +14,11 @@ MainWindow::MainWindow()
 
 void MainWindow::onInputContentSolveButtonPressed()
 {
-    auto table{m_inputContent->getTable()}; // Get the prepared table
+    auto board{m_inputContent->getBoard()}; // Get the prepared board
     this->remove(); // Clear the window
     delete m_inputContent;
 
-    m_outputContent = std::make_unique<OutputWindowContent>(table);
+    m_outputContent = std::make_unique<OutputWindowContent>(board);
     this->add(*m_outputContent); // Display the output screen
 
     show_all_children();

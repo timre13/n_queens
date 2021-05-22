@@ -1,19 +1,19 @@
-#include "Table.h"
+#include "Board.h"
 #include "config.h"
 #include <giomm/icon.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/label.h>
 #include <gtkmm/image.h>
 
-Table::Table(int size)
+Board::Board(int size)
     : m_size{size}
 {
-    set_size_request(TABLE_WIDGET_DIMENSIONS_PX, TABLE_WIDGET_DIMENSIONS_PX);
+    set_size_request(BOARD_WIDGET_DIMENSIONS_PX, BOARD_WIDGET_DIMENSIONS_PX);
 }
 
-bool Table::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
+bool Board::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
 {
-    context->scale(TABLE_WIDGET_DIMENSIONS_PX, TABLE_WIDGET_DIMENSIONS_PX);
+    context->scale(BOARD_WIDGET_DIMENSIONS_PX, BOARD_WIDGET_DIMENSIONS_PX);
     context->set_source_rgb(1, 1, 1);
     context->paint();
 
@@ -48,7 +48,7 @@ bool Table::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
     return true;
 }
 
-bool Table::wouldBeCorrect(int xPos, int yPos) const
+bool Board::wouldBeCorrect(int xPos, int yPos) const
 {
     for (auto& queen : m_queens)
     {

@@ -2,12 +2,12 @@
 #include <gtkmm/application.h>
 #include <gtkmm/window.h>
 
-OutputWindowContent::OutputWindowContent(Table* table)
+OutputWindowContent::OutputWindowContent(Board* board)
     :
-    m_table{table}
+    m_board{board}
 {
     set_border_width(10);
 
-    attach(*m_table, 0, 0);
+    attach(*m_board, 0, 0);
 }
 
