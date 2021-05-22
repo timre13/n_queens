@@ -5,13 +5,12 @@
 #include <gtkmm/window.h>
 #include <gtkmm/grid.h>
 
-class OutputWindow final : public Gtk::Window
+class OutputWindowContent final : public Gtk::Grid
 {
 private:
-    std::unique_ptr<Gtk::Grid> m_grid;
     std::unique_ptr<Table> m_table;
 
 public:
-    OutputWindow();
+    OutputWindowContent(Table* table);
 };
 

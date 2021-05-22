@@ -76,13 +76,15 @@ LINK_LIBRARIES(
 
 ADD_EXECUTABLE(n_queens
     src/main.cpp
-    src/InputWindow.h
-    src/InputWindow.cpp
+    src/MainWindow.h
+    src/MainWindow.cpp
+    src/InputWindowContent.h
+    src/InputWindowContent.cpp
+    src/OutputWindowContent.h
+    src/OutputWindowContent.cpp
     src/Table.h
     src/Table.cpp
     src/Queen.h
-    src/OutputWindow.h
-    src/OutputWindow.cpp
     src/config.h
 )
 
