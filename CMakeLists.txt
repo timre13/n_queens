@@ -85,6 +85,7 @@ ADD_EXECUTABLE(n_queens
     src/Board.h
     src/Board.cpp
     src/Queen.h
+    src/TreeNode.h
     src/config.h
 )
 

@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "config.h"
+#include <algorithm>
 #include <giomm/icon.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/label.h>
@@ -10,6 +11,23 @@ Board::Board(int size)
 {
     set_size_request(BOARD_WIDGET_DIMENSIONS_PX, BOARD_WIDGET_DIMENSIONS_PX);
 }
+
+/*
+Board::Board(const Board& another)
+{
+    m_size = another.getSize();
+    m_lastCheckedCoords = nullptr;
+    std::copy(another.m_queens.begin(), another.m_queens.end(), m_queens.begin());
+}
+
+Board& Board::operator=(const Board& another)
+{
+    m_size = another.getSize();
+    m_lastCheckedCoords = nullptr;
+    std::copy(another.m_queens.begin(), another.m_queens.end(), m_queens.begin());
+    return *this;
+}
+*/
 
 bool Board::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
 {
@@ -48,8 +66,11 @@ bool Board::on_draw(const Cairo::RefPtr<Cairo::Context>& context)
     return true;
 }
 
-bool Board::wouldBeCorrect(int xPos, int yPos) const
+bool Board::wouldBeCorrect(int xPos, int yPos)
 {
+    assert(xPos < m_size && yPos < m_size);
+    m_lastCheckedCoords = {xPos < m_size ? xPos : -1, yPos < m_size ? yPos : -1};
+
     for (auto& queen : m_queens)
     {
         // Row and column check
@@ -59,16 +80,6 @@ bool Board::wouldBeCorrect(int xPos, int yPos) const
         // Diagonal check
         if (std::abs(xPos - queen.getXPos()) == std::abs(yPos - queen.getYPos()))
             return false;
-        /*
-        for (int i{-m_size}; i <= m_size; ++i)
-        {
-            if ((xPos == queen.getXPos() + i && yPos == queen.getYPos() - i) || // Top right
-                (xPos == queen.getXPos() - i && yPos == queen.getYPos() - i) || // Top left
-                (xPos == queen.getXPos() - i && yPos == queen.getYPos() + i) || // Bottom left
-                (xPos == queen.getXPos() + i && yPos == queen.getYPos() + i))   // Bottom right
-                return false;
-        }
-        */
     }
 
     return true;
