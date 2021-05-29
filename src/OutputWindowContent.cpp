@@ -1,5 +1,7 @@
 #include "OutputWindowContent.h"
+#include "config.h"
 #include <gtkmm/application.h>
+#include <gtkmm/enums.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/window.h>
 #include <memory>
@@ -8,7 +10,10 @@
 OutputWindowContent::OutputWindowContent(Board* board)
     :
     m_progressBar{std::make_unique<Gtk::ProgressBar>()},
-    m_solutionTree{std::make_unique<TreeNode>(TreeNode{board})} // The initial board is the root node
+    m_solutionTree{std::make_unique<TreeNode>(TreeNode{board})}, // The initial board is the root node
+    m_prevSolutionButton{std::make_unique<Gtk::Button>()},
+    m_nextSolutionButton{std::make_unique<Gtk::Button>()},
+    m_noSolutionsLabel{std::make_unique<Gtk::Label>()}
 {
     set_border_width(10);
 
@@ -26,15 +31,55 @@ OutputWindowContent::OutputWindowContent(Board* board)
      * If the non-recursive algorithm is selected,
      * make it possible to specify the number of solutions to find.
      */
-    solveProblemNonrecursively(5);
+    solveProblemNonrecursively(100);
     std::cout << "Found " << m_solutionNodes.size() << " solution(s)" << std::endl;
     this->remove(*m_progressBar);
 
-    /*
-     * XXX: Make it possible to step between solutions.
-     */
     if (m_solutionNodes.size())
-        attach(*m_solutionNodes[0]->getBoard(), 0, 1);
+    {
+        attach(*m_prevSolutionButton, 0, 1);
+        m_prevSolutionButton->set_image_from_icon_name("media-seek-backward");
+        m_prevSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
+        m_prevSolutionButton->signal_pressed().connect(
+            [this](){
+                m_nextSolutionButton->set_state(Gtk::StateType::STATE_NORMAL);
+
+                this->remove(*m_solutionNodes[m_shownSolutionI]->getBoard());
+                --m_shownSolutionI;
+                assert(m_shownSolutionI >= 0);
+                attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
+                show_all_children();
+
+                if (m_shownSolutionI == 0)
+                    m_prevSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
+            }
+        );
+
+        attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
+
+        attach(*m_nextSolutionButton, 2, 1);
+        m_nextSolutionButton->set_image_from_icon_name("media-seek-forward");
+        m_nextSolutionButton->signal_pressed().connect(
+            [this](){
+                m_prevSolutionButton->set_state(Gtk::StateType::STATE_NORMAL);
+
+                this->remove(*m_solutionNodes[m_shownSolutionI]->getBoard());
+                ++m_shownSolutionI;
+                assert(m_shownSolutionI < (int)m_solutionNodes.size());
+                attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
+                show_all_children();
+
+                if (m_shownSolutionI == (int)m_solutionNodes.size()-1)
+                    m_nextSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
+            }
+        );
+    }
+    else
+    {
+        m_noSolutionsLabel->set_text("No solutions found.");
+        m_noSolutionsLabel->set_size_request(BOARD_WIDGET_DIMENSIONS_PX, BOARD_WIDGET_DIMENSIONS_PX);
+        this->add(*m_noSolutionsLabel);
+    }
 }
 
 void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
