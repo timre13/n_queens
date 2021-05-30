@@ -23,5 +23,6 @@ public:
     OutputWindowContent(Board* board);
 
     void solveProblemNonrecursively(int maxSolutionNum);
+    void solveProblemRecursively();
 };
 

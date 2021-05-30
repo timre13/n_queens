@@ -6,6 +6,7 @@
 #include <gtkmm/label.h>
 #include <gtkmm/image.h>
 
+// XXX: Don't create a widget for every board, make an another class for the purpose
 Board::Board(int size)
     : m_size{size}
 {

@@ -7,6 +7,8 @@
 #include <memory>
 #include <iostream>
 
+#define DEBUG_LOG 0
+
 OutputWindowContent::OutputWindowContent(Board* board)
     :
     m_progressBar{std::make_unique<Gtk::ProgressBar>()},
@@ -30,8 +32,11 @@ OutputWindowContent::OutputWindowContent(Board* board)
      * recursive (top to bottom) algorithms.
      * If the non-recursive algorithm is selected,
      * make it possible to specify the number of solutions to find.
+     *
+     * XXX: Multi-threading
      */
-    solveProblemNonrecursively(100);
+    //solveProblemNonrecursively(100);
+    solveProblemRecursively();
     std::cout << "Found " << m_solutionNodes.size() << " solution(s)" << std::endl;
     this->remove(*m_progressBar);
 
@@ -116,6 +121,7 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
         else
         {
             std::cout << "Adding a queen at: " << i%boardSize << ", " << i/boardSize << std::endl;
+            // TODO: Filter out duplicates
             node = node->addChild();
             node->getBoard()->addQueen(i%boardSize, i/boardSize);
             std::cout << "Node now has " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
@@ -139,5 +145,58 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
     /*
     m_progressBar->pulse();
     */
+}
+
+static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
+{
+#if DEBUG_LOG
+    std::cout << "Solving a level with " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
+#endif
+
+    if ((int)node->getBoard()->getNumOfQueens() == node->getBoard()->getSize())
+    {
+#if DEBUG_LOG
+        std::cout << "Board is full" << std::endl;
+#endif
+        solutionNodes.push_back(node);
+        return;
+    }
+
+    Board* const boardPtr = node->getBoard();
+    const int boardSize = boardPtr->getSize();
+
+    for (int i{}; i < boardSize*boardSize; ++i)
+    {
+        if (boardPtr->wouldBeCorrect(i%boardSize, i/boardSize))
+        {
+            // TODO: Filter out duplicates
+
+            node->addChild()->getBoard()->addQueen(i%boardSize, i/boardSize);
+#if DEBUG_LOG
+            std::cout << "Added a child" << std::endl;
+#endif
+        }
+        else
+        {
+#if DEBUG_LOG
+            std::cout << "Skipping " << i%boardSize << ", " << i/boardSize << std::endl;
+#endif
+        }
+    }
+#if DEBUG_LOG
+    std::cout << "End of a level" << std::endl;
+#endif
+
+    for (size_t i{}; i < node->getNumOfChildren(); ++i)
+        solveLevel(node->getChild(i), solutionNodes);
+
+#if DEBUG_LOG
+    std::cout << "End of child" << std::endl;
+#endif
+}
+
+void OutputWindowContent::solveProblemRecursively()
+{
+    solveLevel(m_solutionTree.get(), m_solutionNodes);
 }
 
