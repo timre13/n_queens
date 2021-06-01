@@ -3,10 +3,10 @@
 #include "config.h"
 #include <gdkmm/device.h>
 #include <gtkmm/enums.h>
+#include <gtkmm/messagedialog.h>
 #include <memory>
 #include <pangomm/fontdescription.h>
 #include <sigc++/functors/mem_fun.h>
-#include <iostream>
 
 InputWindowContent::InputWindowContent()
     :
@@ -56,10 +56,18 @@ bool InputWindowContent::onCanvasClicked(GdkEventButton* button)
     if ((int)m_boardWidget->getBoardPtr()->getNumOfQueens() == m_boardWidget->getBoardPtr()->getSize())
         return true;
 
+    const int queenX = button->x / ((double)BOARD_WIDGET_DIMENSIONS_PX / m_boardWidget->getBoardPtr()->getSize());
+    const int queenY = button->y / ((double)BOARD_WIDGET_DIMENSIONS_PX / m_boardWidget->getBoardPtr()->getSize());
+
+    if (!m_boardWidget->getBoardPtr()->wouldBeCorrect(queenX, queenY))
+    {
+        auto dialog{std::make_unique<Gtk::MessageDialog>("You can't place a queen there.", Gtk::MessageType::MESSAGE_ERROR)};
+        dialog->run();
+        return true;
+    }
+
     // Mouse coords to grid coords
-    m_boardWidget->getBoardPtr()->addQueen(
-            button->x / ((double)BOARD_WIDGET_DIMENSIONS_PX / m_boardWidget->getBoardPtr()->getSize()),
-            button->y / ((double)BOARD_WIDGET_DIMENSIONS_PX / m_boardWidget->getBoardPtr()->getSize()));
+    m_boardWidget->getBoardPtr()->addQueen(queenX, queenY);
     m_boardWidget->queue_draw();
 
     return true; // TODO: What's this?
