@@ -7,33 +7,18 @@ Board::Board(int size)
 {
 }
 
-/*
-Board::Board(const Board& another)
-{
-    m_size = another.getSize();
-    m_lastCheckedCoords = nullptr;
-    std::copy(another.m_queens.begin(), another.m_queens.end(), m_queens.begin());
-}
-
-Board& Board::operator=(const Board& another)
-{
-    m_size = another.getSize();
-    m_lastCheckedCoords = nullptr;
-    std::copy(another.m_queens.begin(), another.m_queens.end(), m_queens.begin());
-    return *this;
-}
-*/
-
 bool Board::operator==(const Board& another) const
 {
     if (another.getNumOfQueens() != m_queens.size())
         return false;
 
-    for (size_t i{}; i < m_queens.size(); ++i)
+    auto it1 = m_queens.begin();
+    auto it2 = another.m_queens.begin();
+    for (; it1 != m_queens.end();)
     {
-        if (m_queens[i].getXPos() != another.getQueen(i)->getXPos() ||
-            m_queens[i].getYPos() != another.getQueen(i)->getYPos())
+        if (*it1 != *it2)
             return false;
+        ++it1; ++it2;
     }
 
     return true;

@@ -38,10 +38,17 @@ OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
      */
     //solveProblemNonrecursively(100);
     solveProblemRecursively();
-    std::cout << "Found " << m_solutionNodes.size() << " solution(s)" << std::endl;
+    std::cout << "Found " << m_solutionBoards.size() << " unique solution(s)" << std::endl;
+
     this->remove(*m_progressBar);
 
-    if (m_solutionNodes.size())
+    if (m_solutionBoards.size())
+    {
+        m_boardWidget->setBoardPtr(m_solutionBoards[m_shownSolutionI]);
+        attach(*m_boardWidget, 1, 1);
+    }
+
+    if (m_solutionBoards.size() > 1)
     {
         attach(*m_prevSolutionButton, 0, 1);
         m_prevSolutionButton->set_image_from_icon_name("media-seek-backward");
@@ -52,16 +59,13 @@ OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
 
                 --m_shownSolutionI;
                 assert(m_shownSolutionI >= 0);
-                m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
+                m_boardWidget->setBoardPtr(m_solutionBoards[m_shownSolutionI]);
                 m_boardWidget->queue_draw();
 
                 if (m_shownSolutionI == 0)
                     m_prevSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
             }
         );
-
-        m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
-        attach(*m_boardWidget, 1, 1);
 
         attach(*m_nextSolutionButton, 2, 1);
         m_nextSolutionButton->set_image_from_icon_name("media-seek-forward");
@@ -70,21 +74,31 @@ OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
                 m_prevSolutionButton->set_state(Gtk::StateType::STATE_NORMAL);
 
                 ++m_shownSolutionI;
-                assert(m_shownSolutionI < (int)m_solutionNodes.size());
-                m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
+                assert(m_shownSolutionI < (int)m_solutionBoards.size());
+                m_boardWidget->setBoardPtr(m_solutionBoards[m_shownSolutionI]);
                 m_boardWidget->queue_draw();
 
-                if (m_shownSolutionI == (int)m_solutionNodes.size()-1)
+                if (m_shownSolutionI == (int)m_solutionBoards.size()-1)
                     m_nextSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
             }
         );
     }
-    else
+    else if (m_solutionBoards.size() == 0)
     {
         m_noSolutionsLabel->set_text("No solutions found.");
         m_noSolutionsLabel->set_size_request(BOARD_WIDGET_DIMENSIONS_PX, BOARD_WIDGET_DIMENSIONS_PX);
         this->add(*m_noSolutionsLabel);
     }
+}
+
+static bool isInSolutionList(const std::vector<Board*>& solutionBoards, const Board* board)
+{
+    for (auto& _board : solutionBoards)
+    {
+        if (*_board == *board)
+            return true;
+    }
+    return false;
 }
 
 void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
@@ -121,19 +135,21 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
         else
         {
             std::cout << "Adding a queen at: " << i%boardSize << ", " << i/boardSize << std::endl;
-            // TODO: Filter out duplicates
             node = node->addChild();
             node->getBoard()->addQueen(i%boardSize, i/boardSize);
             std::cout << "Node now has " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
             assert((int)node->getBoard()->getNumOfQueens() <= boardSize);
             if ((int)node->getBoard()->getNumOfQueens() == boardSize)
             {
-                std::cout << "Found a solution" << std::endl;
-                m_solutionNodes.push_back(node);
+                if (!isInSolutionList(m_solutionBoards, node->getBoard()))
+                {
+                    std::cout << "Found a solution" << std::endl;
+                    m_solutionBoards.push_back(node->getBoard());
+                }
                 /*
                  * FIXME: Endless loop if max number of solutions is not specified.
                  */
-                if (m_solutionNodes.size() == (size_t)maxSolutionNum)
+                if (m_solutionBoards.size() == (size_t)maxSolutionNum)
                     return;
                 assert(node->getParent()); // The root board can't be full
                 node = node->getParent();
@@ -147,7 +163,7 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
     */
 }
 
-static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
+static void solveLevel(TreeNode* node, std::vector<Board*>& solutionBoards)
 {
 #if DEBUG_LOG
     std::cout << "Solving a level with " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
@@ -158,7 +174,8 @@ static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
 #if DEBUG_LOG
         std::cout << "Board is full" << std::endl;
 #endif
-        solutionNodes.push_back(node);
+        if (!isInSolutionList(solutionBoards, node->getBoard()))
+            solutionBoards.push_back(node->getBoard());
         return;
     }
 
@@ -169,8 +186,6 @@ static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
     {
         if (boardPtr->wouldBeCorrect(i%boardSize, i/boardSize))
         {
-            // TODO: Filter out duplicates
-
             node->addChild()->getBoard()->addQueen(i%boardSize, i/boardSize);
 #if DEBUG_LOG
             std::cout << "Added a child" << std::endl;
@@ -188,7 +203,7 @@ static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
 #endif
 
     for (size_t i{}; i < node->getNumOfChildren(); ++i)
-        solveLevel(node->getChild(i), solutionNodes);
+        solveLevel(node->getChild(i), solutionBoards);
 
 #if DEBUG_LOG
     std::cout << "End of child" << std::endl;
@@ -197,6 +212,6 @@ static void solveLevel(TreeNode* node, std::vector<TreeNode*>& solutionNodes)
 
 void OutputWindowContent::solveProblemRecursively()
 {
-    solveLevel(m_solutionTree.get(), m_solutionNodes);
+    solveLevel(m_solutionTree.get(), m_solutionBoards);
 }
 

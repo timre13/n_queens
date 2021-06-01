@@ -2,14 +2,14 @@
 
 #include "Queen.h"
 #include "config.h"
-#include <vector>
+#include <set>
 #include <cassert>
 
 class Board
 {
 private:
     int m_size{};
-    std::vector<Queen> m_queens;
+    std::set<Queen> m_queens;
     Queen m_lastCheckedCoords{-1, -1};
 
 public:
@@ -38,13 +38,10 @@ public:
     {
         assert((int)m_queens.size() < m_size);
         assert(xPos < m_size && yPos < m_size);
-        m_queens.push_back({xPos, yPos});
+        m_queens.insert({xPos, yPos});
     }
-    inline Queen* getLastAddedQueen() { return m_queens.size() ? &(m_queens[m_queens.size()]) : nullptr; }
-    inline Queen* getQueen(size_t index) { assert(index < m_queens.size()); return &m_queens[index]; }
-    inline const Queen* getQueen(size_t index) const { assert(index < m_queens.size()); return &m_queens[index]; }
-    inline std::vector<Queen>::const_iterator begin() const { return m_queens.begin(); }
-    inline std::vector<Queen>::const_iterator end() const { return m_queens.end(); }
+    inline std::set<Queen>::const_iterator begin() const { return m_queens.begin(); }
+    inline std::set<Queen>::const_iterator end() const { return m_queens.end(); }
 
     bool wouldBeCorrect(int xPos, int yPos);
 };
