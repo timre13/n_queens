@@ -14,7 +14,7 @@ MainWindow::MainWindow()
 
 void MainWindow::onInputContentSolveButtonPressed()
 {
-    auto board{m_inputContent->getBoard()}; // Get the prepared board
+    auto board{m_inputContent->getBoardWidget()}; // Get the prepared board
     this->remove(); // Clear the window
     delete m_inputContent;
 

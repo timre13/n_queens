@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Board.h"
+#include "BoardWidget.h"
 #include "TreeNode.h"
 #include <memory>
 #include <gtkmm/grid.h>
@@ -12,6 +12,7 @@ class OutputWindowContent final : public Gtk::Grid
 {
 private:
     std::unique_ptr<Gtk::ProgressBar> m_progressBar;
+    std::unique_ptr<BoardWidget> m_boardWidget;
     std::unique_ptr<TreeNode> m_solutionTree;
     std::vector<TreeNode*> m_solutionNodes;
     int m_shownSolutionI{};
@@ -20,7 +21,7 @@ private:
     std::unique_ptr<Gtk::Label> m_noSolutionsLabel;
 
 public:
-    OutputWindowContent(Board* board);
+    OutputWindowContent(BoardWidget* boardWidget);
 
     void solveProblemNonrecursively(int maxSolutionNum);
     void solveProblemRecursively();

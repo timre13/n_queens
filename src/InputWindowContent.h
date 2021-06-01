@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Board.h"
+#include "BoardWidget.h"
 #include <memory>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/grid.h>
@@ -14,13 +15,13 @@ private:
     std::unique_ptr<Gtk::Frame> m_sizeFrame;
     std::unique_ptr<Gtk::Grid> m_sizeFrameGrid;
     std::unique_ptr<Gtk::SpinButton> m_spinButton;
-    Board* m_board;
+    BoardWidget* m_boardWidget{};
     std::unique_ptr<Gtk::Button> m_solveButton;
 
 public:
     InputWindowContent();
 
-    Board* getBoard() const { return m_board; }
+    BoardWidget* getBoardWidget() const { return m_boardWidget; }
 
     void onSpinButtonChanged();
     bool onCanvasClicked(GdkEventButton* button);

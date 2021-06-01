@@ -2,13 +2,10 @@
 
 #include "Queen.h"
 #include "config.h"
-#include <cairomm/context.h>
-#include <cairomm/refptr.h>
-#include <gtkmm/drawingarea.h>
 #include <vector>
 #include <cassert>
 
-class Board final : public Gtk::DrawingArea
+class Board
 {
 private:
     int m_size{};
@@ -20,14 +17,12 @@ public:
     Board(const Board& another) = delete;
     Board& operator=(const Board& another) = delete;
 
+    bool operator==(const Board& another) const;
+
     static Board* createAsCopy(const Board* another)
     {
         assert(another);
         Board* newBoard = new Board{another->getSize()};
-        /*
-        for (size_t i{}; i < another->m_queens.size(); ++i)
-            newBoard->m_queens.push_back(another->m_queens[i]);
-        */
         newBoard->m_queens = another->m_queens;
         return newBoard;
     }
@@ -46,8 +41,10 @@ public:
         m_queens.push_back({xPos, yPos});
     }
     inline Queen* getLastAddedQueen() { return m_queens.size() ? &(m_queens[m_queens.size()]) : nullptr; }
+    inline Queen* getQueen(size_t index) { assert(index < m_queens.size()); return &m_queens[index]; }
+    inline const Queen* getQueen(size_t index) const { assert(index < m_queens.size()); return &m_queens[index]; }
+    inline std::vector<Queen>::const_iterator begin() const { return m_queens.begin(); }
+    inline std::vector<Queen>::const_iterator end() const { return m_queens.end(); }
 
     bool wouldBeCorrect(int xPos, int yPos);
-
-    virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& context) override;
 };

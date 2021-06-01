@@ -84,6 +84,8 @@ ADD_EXECUTABLE(n_queens
     src/OutputWindowContent.cpp
     src/Board.h
     src/Board.cpp
+    src/BoardWidget.h
+    src/BoardWidget.cpp
     src/Queen.h
     src/TreeNode.h
     src/config.h

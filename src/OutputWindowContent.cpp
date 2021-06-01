@@ -9,10 +9,11 @@
 
 #define DEBUG_LOG 0
 
-OutputWindowContent::OutputWindowContent(Board* board)
+OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
     :
     m_progressBar{std::make_unique<Gtk::ProgressBar>()},
-    m_solutionTree{std::make_unique<TreeNode>(TreeNode{board})}, // The initial board is the root node
+    m_boardWidget{boardWidget},
+    m_solutionTree{std::make_unique<TreeNode>(TreeNode{m_boardWidget->getBoardPtr()})}, // The initial board is the root node
     m_prevSolutionButton{std::make_unique<Gtk::Button>()},
     m_nextSolutionButton{std::make_unique<Gtk::Button>()},
     m_noSolutionsLabel{std::make_unique<Gtk::Label>()}
@@ -22,7 +23,7 @@ OutputWindowContent::OutputWindowContent(Board* board)
     attach(*m_progressBar, 0, 0);
     m_progressBar->set_text("Solving...");
     m_progressBar->set_show_text();
-    m_progressBar->set_pulse_step(1.0/(board->getSize()*board->getSize()));
+    m_progressBar->set_pulse_step(1.0/(m_boardWidget->getBoardPtr()->getSize()*m_boardWidget->getBoardPtr()->getSize()));
 
     show_all_children();
 
@@ -49,18 +50,18 @@ OutputWindowContent::OutputWindowContent(Board* board)
             [this](){
                 m_nextSolutionButton->set_state(Gtk::StateType::STATE_NORMAL);
 
-                this->remove(*m_solutionNodes[m_shownSolutionI]->getBoard());
                 --m_shownSolutionI;
                 assert(m_shownSolutionI >= 0);
-                attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
-                show_all_children();
+                m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
+                m_boardWidget->queue_draw();
 
                 if (m_shownSolutionI == 0)
                     m_prevSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
             }
         );
 
-        attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
+        m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
+        attach(*m_boardWidget, 1, 1);
 
         attach(*m_nextSolutionButton, 2, 1);
         m_nextSolutionButton->set_image_from_icon_name("media-seek-forward");
@@ -68,11 +69,10 @@ OutputWindowContent::OutputWindowContent(Board* board)
             [this](){
                 m_prevSolutionButton->set_state(Gtk::StateType::STATE_NORMAL);
 
-                this->remove(*m_solutionNodes[m_shownSolutionI]->getBoard());
                 ++m_shownSolutionI;
                 assert(m_shownSolutionI < (int)m_solutionNodes.size());
-                attach(*m_solutionNodes[m_shownSolutionI]->getBoard(), 1, 1);
-                show_all_children();
+                m_boardWidget->setBoardPtr(m_solutionNodes[m_shownSolutionI]->getBoard());
+                m_boardWidget->queue_draw();
 
                 if (m_shownSolutionI == (int)m_solutionNodes.size()-1)
                     m_nextSolutionButton->set_state(Gtk::StateType::STATE_INSENSITIVE);
