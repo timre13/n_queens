@@ -12,28 +12,6 @@ private:
     Board* m_board{};
 
 public:
-    /*
-    static inline TreeNode* createWithBoardSize(TreeNode* parent, int boardSize)
-    {
-        return new TreeNode{parent, boardSize};
-    }
-
-    static inline TreeNode* createFromBoard(TreeNode* parent, Board* board)
-    {
-        return new TreeNode{parent, board};
-    }
-    */
-
-    /*
-     * Create a new node by creating an empty board of size `boardSize`.
-     * Set the parent to nullptr.
-     */
-    /*
-    static inline TreeNode* createRootNode(int boardSize)
-    {
-        return new TreeNode{nullptr, new Board{boardSize}};
-    }
-    */
 
     /*
      * Create by copying the parent's board.
@@ -59,7 +37,6 @@ public:
     }
 
     inline Board* getBoard() const { return m_board; }
-
     inline TreeNode* getParent() const { return m_parent; }
 
     inline size_t getNumOfChildren() const { return m_children.size(); }

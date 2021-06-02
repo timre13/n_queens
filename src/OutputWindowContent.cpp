@@ -110,8 +110,8 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
         int i{};
         if (node
             && node->getBoard()
-            && node->getBoard()->getLastCheckedCoords().getXPos() != -1
-            && node->getBoard()->getLastCheckedCoords().getYPos() != -1)
+            && node->getBoard()->getLastCheckedCoords().getXPos() != (Queen::coord_t)-1
+            && node->getBoard()->getLastCheckedCoords().getYPos() != (Queen::coord_t)-1)
             i = node->getBoard()->getLastCheckedCoords().getXPos() +
                 node->getBoard()->getLastCheckedCoords().getYPos() * boardSize + 1;
 
@@ -158,9 +158,8 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
         }
     }
 
-    /*
-    m_progressBar->pulse();
-    */
+    // TODO
+    //m_progressBar->pulse();
 }
 
 static void solveLevel(TreeNode* node, std::vector<Board*>& solutionBoards)

@@ -2,9 +2,12 @@
 #include "config.h"
 #include <algorithm>
 
-Board::Board(int size)
+Board::Board(Queen::coord_t size)
     : m_size{size}
 {
+    assert(size >= 4);
+    assert(size <= MAX_BOARD_SIZE);
+    assert(size < (int)(Queen::coord_t)-1);
 }
 
 bool Board::operator==(const Board& another) const
@@ -24,10 +27,10 @@ bool Board::operator==(const Board& another) const
     return true;
 }
 
-bool Board::wouldBeCorrect(int xPos, int yPos)
+bool Board::wouldBeCorrect(Queen::coord_t xPos, Queen::coord_t yPos)
 {
     assert(xPos < m_size && yPos < m_size);
-    m_lastCheckedCoords = {xPos < m_size ? xPos : -1, yPos < m_size ? yPos : -1};
+    m_lastCheckedCoords = {xPos < m_size ? xPos : (Queen::coord_t)-1, yPos < m_size ? yPos : (Queen::coord_t)-1};
 
     for (auto& queen : m_queens)
     {

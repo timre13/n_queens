@@ -43,8 +43,27 @@ InputWindowContent::InputWindowContent()
     show_all_children();
 }
 
+/*
+ * Shows an error dialog and returns true if the board is too large to fit in the destination variable.
+ */
+static bool checkBoardSize(int size)
+{
+    if (size >= (int)(Queen::coord_t)-1)
+    {
+        auto dialog{std::make_unique<Gtk::MessageDialog>(
+                "Board is too large.\n(Adjust the compile-time constant QUEEN_COORD_TYPE).",
+                Gtk::MessageType::MESSAGE_ERROR)};
+        dialog->run();
+        return 1;
+    }
+    return 0;
+}
+
 void InputWindowContent::onSpinButtonChanged()
 {
+    if (checkBoardSize(m_spinButton->get_value_as_int()))
+        return;
+
     m_boardWidget->getBoardPtr()->setSize(m_spinButton->get_value_as_int());
     m_boardWidget->getBoardPtr()->clearQueens();
     m_boardWidget->queue_draw();
@@ -75,6 +94,9 @@ bool InputWindowContent::onCanvasClicked(GdkEventButton* button)
 
 void InputWindowContent::onSolveButtonPressed()
 {
+    if (checkBoardSize(m_spinButton->get_value_as_int()))
+        return;
+
     dynamic_cast<MainWindow*>(get_parent())->onInputContentSolveButtonPressed();
 }
 
