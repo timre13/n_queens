@@ -8,7 +8,8 @@
 class MainWindow final : public Gtk::ApplicationWindow
 {
 private:
-    InputWindowContent* m_inputContent{};
+    std::shared_ptr<BoardWidget> m_boardWidget;
+    std::unique_ptr<InputWindowContent> m_inputContent{};
     std::unique_ptr<OutputWindowContent> m_outputContent{};
 
 public:

@@ -13,15 +13,15 @@
 class BoardWidget  final : public Gtk::DrawingArea
 {
 private:
-    Board* m_boardPtr{};
+    std::shared_ptr<Board> m_boardPtr;
 
 public:
-    BoardWidget(Board* board);
+    BoardWidget(std::shared_ptr<Board> board);
 
-    void setBoardPtr(Board* boardPtr) { m_boardPtr = boardPtr; }
+    void setBoardPtr(std::shared_ptr<Board> board) { m_boardPtr = board; }
 
-    const Board* getBoardPtr() const { return m_boardPtr; }
-    Board* getBoardPtr() { return m_boardPtr; }
+    const std::shared_ptr<Board> getBoardPtr() const { return m_boardPtr; }
+    std::shared_ptr<Board> getBoardPtr() { return m_boardPtr; }
 
     virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& context) override;
 };

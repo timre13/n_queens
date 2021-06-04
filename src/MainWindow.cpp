@@ -2,11 +2,13 @@
 #include <memory>
 
 MainWindow::MainWindow()
+    :
+    m_boardWidget{std::make_shared<BoardWidget>(std::make_shared<Board>(8))},
+    m_inputContent{std::make_unique<InputWindowContent>(m_boardWidget)}
 {
     set_title("N Queens");
     set_resizable(false);
 
-    m_inputContent = new InputWindowContent;
     this->add(*m_inputContent);
 
     show_all_children();
@@ -14,11 +16,10 @@ MainWindow::MainWindow()
 
 void MainWindow::onInputContentSolveButtonPressed()
 {
-    auto board{m_inputContent->getBoardWidget()}; // Get the prepared board
     this->remove(); // Clear the window
-    delete m_inputContent;
+    m_inputContent.reset();
 
-    m_outputContent = std::make_unique<OutputWindowContent>(board);
+    m_outputContent = std::make_unique<OutputWindowContent>(m_boardWidget);
     this->add(*m_outputContent); // Display the output screen
 
     show_all_children();

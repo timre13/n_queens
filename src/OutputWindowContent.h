@@ -13,16 +13,16 @@ class OutputWindowContent final : public Gtk::Grid
 {
 private:
     std::unique_ptr<Gtk::ProgressBar> m_progressBar;
-    std::unique_ptr<BoardWidget> m_boardWidget;
-    std::unique_ptr<TreeNode> m_solutionTree;
-    std::vector<Board*> m_solutionBoards;
+    std::shared_ptr<BoardWidget> m_boardWidget;
+    std::shared_ptr<TreeNode> m_solutionTree;
+    std::vector<std::shared_ptr<Board>> m_solutionBoards;
     int m_shownSolutionI{};
     std::unique_ptr<Gtk::Button> m_prevSolutionButton;
     std::unique_ptr<Gtk::Button> m_nextSolutionButton;
     std::unique_ptr<Gtk::Label> m_noSolutionsLabel;
 
 public:
-    OutputWindowContent(BoardWidget* boardWidget);
+    OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget);
 
     void solveProblemNonrecursively(int maxSolutionNum);
     void solveProblemRecursively();

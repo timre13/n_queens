@@ -8,12 +8,12 @@
 #include <pangomm/fontdescription.h>
 #include <sigc++/functors/mem_fun.h>
 
-InputWindowContent::InputWindowContent()
+InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     :
     m_sizeFrame{std::make_unique<Gtk::Frame>()},
     m_sizeFrameGrid{std::make_unique<Gtk::Grid>()},
     m_spinButton{std::make_unique<Gtk::SpinButton>()},
-    m_boardWidget{new BoardWidget{new Board{8}}},
+    m_boardWidget{boardWidget},
     m_solveButton{std::make_unique<Gtk::Button>()}
 {
     set_border_width(10);

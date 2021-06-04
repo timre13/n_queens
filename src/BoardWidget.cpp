@@ -1,6 +1,6 @@
 #include "BoardWidget.h"
 
-BoardWidget::BoardWidget(Board* board)
+BoardWidget::BoardWidget(std::shared_ptr<Board> board)
     :
     m_boardPtr{board}
 {

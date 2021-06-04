@@ -9,11 +9,11 @@
 
 #define DEBUG_LOG 0
 
-OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
+OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     :
     m_progressBar{std::make_unique<Gtk::ProgressBar>()},
     m_boardWidget{boardWidget},
-    m_solutionTree{std::make_unique<TreeNode>(TreeNode{m_boardWidget->getBoardPtr()})}, // The initial board is the root node
+    m_solutionTree{std::make_shared<TreeNode>(m_boardWidget->getBoardPtr())}, // The initial board is the root node
     m_prevSolutionButton{std::make_unique<Gtk::Button>()},
     m_nextSolutionButton{std::make_unique<Gtk::Button>()},
     m_noSolutionsLabel{std::make_unique<Gtk::Label>()}
@@ -91,7 +91,7 @@ OutputWindowContent::OutputWindowContent(BoardWidget* boardWidget)
     }
 }
 
-static bool isInSolutionList(const std::vector<Board*>& solutionBoards, const Board* board)
+static bool isInSolutionList(const std::vector<std::shared_ptr<Board>>& solutionBoards, const Board* board)
 {
     for (auto& _board : solutionBoards)
     {
@@ -103,7 +103,7 @@ static bool isInSolutionList(const std::vector<Board*>& solutionBoards, const Bo
 
 void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
 {
-    TreeNode* node = m_solutionTree.get();
+    std::shared_ptr<TreeNode> node = m_solutionTree;
     int boardSize{node->getBoard()->getSize()};
     while (true)
     {
@@ -141,7 +141,7 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
             assert((int)node->getBoard()->getNumOfQueens() <= boardSize);
             if ((int)node->getBoard()->getNumOfQueens() == boardSize)
             {
-                if (!isInSolutionList(m_solutionBoards, node->getBoard()))
+                if (!isInSolutionList(m_solutionBoards, node->getBoard().get()))
                 {
                     std::cout << "Found a solution" << std::endl;
                     m_solutionBoards.push_back(node->getBoard());
@@ -162,7 +162,7 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
     //m_progressBar->pulse();
 }
 
-static void solveLevel(TreeNode* node, std::vector<Board*>& solutionBoards)
+static void solveLevel(std::shared_ptr<TreeNode> node, std::vector<std::shared_ptr<Board>>& solutionBoards)
 {
 #if DEBUG_LOG
     std::cout << "Solving a level with " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
@@ -173,12 +173,12 @@ static void solveLevel(TreeNode* node, std::vector<Board*>& solutionBoards)
 #if DEBUG_LOG
         std::cout << "Board is full" << std::endl;
 #endif
-        if (!isInSolutionList(solutionBoards, node->getBoard()))
+        if (!isInSolutionList(solutionBoards, node->getBoard().get()))
             solutionBoards.push_back(node->getBoard());
         return;
     }
 
-    Board* const boardPtr = node->getBoard();
+    auto boardPtr = node->getBoard();
     const int boardSize = boardPtr->getSize();
 
     for (int i{}; i < boardSize*boardSize; ++i)
@@ -211,6 +211,6 @@ static void solveLevel(TreeNode* node, std::vector<Board*>& solutionBoards)
 
 void OutputWindowContent::solveProblemRecursively()
 {
-    solveLevel(m_solutionTree.get(), m_solutionBoards);
+    solveLevel(m_solutionTree, m_solutionBoards);
 }
 

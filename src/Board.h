@@ -4,6 +4,7 @@
 #include "config.h"
 #include <set>
 #include <cassert>
+#include <memory>
 
 class Board
 {
@@ -19,10 +20,10 @@ public:
 
     bool operator==(const Board& another) const;
 
-    static Board* createAsCopy(const Board* another)
+    static std::shared_ptr<Board> createAsCopy(std::shared_ptr<Board> another)
     {
         assert(another);
-        Board* newBoard = new Board{another->getSize()};
+        auto newBoard = std::make_shared<Board>(another->getSize());
         newBoard->m_queens = another->m_queens;
         return newBoard;
     }

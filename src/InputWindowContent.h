@@ -15,13 +15,11 @@ private:
     std::unique_ptr<Gtk::Frame> m_sizeFrame;
     std::unique_ptr<Gtk::Grid> m_sizeFrameGrid;
     std::unique_ptr<Gtk::SpinButton> m_spinButton;
-    BoardWidget* m_boardWidget{};
+    std::shared_ptr<BoardWidget> m_boardWidget;
     std::unique_ptr<Gtk::Button> m_solveButton;
 
 public:
-    InputWindowContent();
-
-    BoardWidget* getBoardWidget() const { return m_boardWidget; }
+    InputWindowContent(std::shared_ptr<BoardWidget> boardWidget);
 
     void onSpinButtonChanged();
     bool onCanvasClicked(GdkEventButton* button);
