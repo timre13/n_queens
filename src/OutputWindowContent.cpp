@@ -117,33 +117,49 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
 
         while (i%boardSize < boardSize && i/boardSize < boardSize && !node->getBoard()->wouldBeCorrect(i%boardSize, i/boardSize))
         {
+#if DEBUG_LOG
             std::cout << "Skipping " << i%boardSize << ", " << i/boardSize << std::endl;
+#endif
             ++i;
         }
+#if DEBUG_LOG
         std::cout << i << std::endl;
+#endif
         if (i == boardSize*boardSize)
         {
+#if DEBUG_LOG
             std::cout << "Branch finished" << std::endl;
+#endif
             if (!node->getParent()) // FIXME: This does not work 
             {
+#if DEBUG_LOG
                 std::cout << "Solved board" << std::endl;
+#endif
                 return;
             }
             node = node->getParent();
+#if DEBUG_LOG
             std::cout << "Node has " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
+#endif
         }
         else
         {
+#if DEBUG_LOG
             std::cout << "Adding a queen at: " << i%boardSize << ", " << i/boardSize << std::endl;
+#endif
             node = node->addChild();
             node->getBoard()->addQueen(i%boardSize, i/boardSize);
+#if DEBUG_LOG
             std::cout << "Node now has " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
+#endif
             assert((int)node->getBoard()->getNumOfQueens() <= boardSize);
             if ((int)node->getBoard()->getNumOfQueens() == boardSize)
             {
                 if (!isInSolutionList(m_solutionBoards, node->getBoard().get()))
                 {
+#if DEBUG_LOG
                     std::cout << "Found a solution" << std::endl;
+#endif
                     m_solutionBoards.push_back(node->getBoard());
                 }
                 /*
@@ -153,7 +169,9 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
                     return;
                 assert(node->getParent()); // The root board can't be full
                 node = node->getParent();
+#if DEBUG_LOG
                 std::cout << "Node has " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
+#endif
             }
         }
     }
