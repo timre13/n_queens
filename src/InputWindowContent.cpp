@@ -4,9 +4,10 @@
 #include <gdkmm/device.h>
 #include <gtkmm/enums.h>
 #include <gtkmm/messagedialog.h>
-#include <memory>
+#include <gtkmm/radiobuttongroup.h>
 #include <pangomm/fontdescription.h>
-#include <sigc++/functors/mem_fun.h>
+#include <memory>
+#include <limits>
 
 InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     :
@@ -14,9 +15,17 @@ InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     m_sizeFrameGrid{std::make_unique<Gtk::Grid>()},
     m_spinButton{std::make_unique<Gtk::SpinButton>()},
     m_boardWidget{boardWidget},
+    m_algorithmChooserFrame{std::make_unique<Gtk::Frame>()},
+    m_algorithmChooserFrameGrid{std::make_unique<Gtk::Grid>()},
+    m_algorithmChooserButton1{std::make_unique<Gtk::RadioButton>()},
+    m_algorithmChooserButton2{std::make_unique<Gtk::RadioButton>()},
+    m_numOfSolutionsChooserSpinButtonLabel{std::make_unique<Gtk::Label>()},
+    m_numOfSolutionsChooserSpinButton{std::make_unique<Gtk::SpinButton>()},
     m_solveButton{std::make_unique<Gtk::Button>()}
 {
     set_border_width(10);
+
+    //--------------------------- Size selector widget -------------------------
 
     attach(*m_sizeFrame, 1, 1);
     m_sizeFrame->set_label("Size");
@@ -29,16 +38,51 @@ InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     m_spinButton->set_value(8);
     m_spinButton->signal_value_changed().connect(sigc::mem_fun(*this, &InputWindowContent::onSpinButtonChanged));
 
+    //---------------------------- Board widget --------------------------------
+
     attach(*m_boardWidget, 1, 2);
     m_boardWidget->set_margin_top(20);
     m_boardWidget->set_margin_bottom(20);
     m_boardWidget->add_events(Gdk::EventMask::BUTTON_PRESS_MASK | Gdk::EventMask::BUTTON_RELEASE_MASK);
     m_boardWidget->signal_button_release_event().connect(sigc::mem_fun(*this, &InputWindowContent::onCanvasClicked));
 
-    attach(*m_solveButton, 1, 3);
+    //----------------------- Algorithm chooser widgets ------------------------
+
+    // No need to keep the object after construction
+    Gtk::RadioButtonGroup radioButtonGroup;
+
+    attach(*m_algorithmChooserFrame, 1, 3);
+    m_algorithmChooserFrame->set_label("Algorithm");
+
+    m_algorithmChooserFrame->add(*m_algorithmChooserFrameGrid);
+
+    m_algorithmChooserFrameGrid->attach(*m_algorithmChooserButton1, 0, 0);
+    m_algorithmChooserButton1->set_group(radioButtonGroup);
+    m_algorithmChooserButton1->set_label("Recursive");
+    m_algorithmChooserButton1->signal_toggled().connect(sigc::mem_fun(*this, &InputWindowContent::onAlgorithmChooserButtonToggled));
+
+    m_algorithmChooserFrameGrid->attach(*m_algorithmChooserButton2, 0, 1);
+    m_algorithmChooserButton2->join_group(*m_algorithmChooserButton1);
+    m_algorithmChooserButton2->set_label("Backtracking");
+    m_algorithmChooserButton2->signal_toggled().connect(sigc::mem_fun(*this, &InputWindowContent::onAlgorithmChooserButtonToggled));
+
+    m_algorithmChooserFrameGrid->attach(*m_numOfSolutionsChooserSpinButtonLabel, 0, 2);
+    m_numOfSolutionsChooserSpinButtonLabel->set_label("Max. solutions: ");
+
+    m_algorithmChooserFrameGrid->attach(*m_numOfSolutionsChooserSpinButton, 1, 2);
+    m_numOfSolutionsChooserSpinButton->set_range(-1, std::numeric_limits<double>::max());
+    m_numOfSolutionsChooserSpinButton->set_increments(1, 1);
+    m_numOfSolutionsChooserSpinButton->set_value(-1);
+    m_numOfSolutionsChooserSpinButton->set_sensitive(false);
+
+    //----------------------------- Solve button -------------------------------
+
+    attach(*m_solveButton, 1, 4);
     m_solveButton->set_label("Solve!");
     m_solveButton->override_font(Pango::FontDescription{"Sans Regular 18"});
     m_solveButton->signal_pressed().connect(sigc::mem_fun(*this, &InputWindowContent::onSolveButtonPressed));
+
+    //--------------------------------------------------------------------------
 
     show_all_children();
 }

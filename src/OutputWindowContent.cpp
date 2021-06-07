@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG 0
 
-OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
+OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget, bool shouldSolveRecursively, size_t numOfSolutionsToFind)
     :
     m_progressBar{std::make_unique<Gtk::ProgressBar>()},
     m_boardWidget{boardWidget},
@@ -27,17 +27,12 @@ OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidge
 
     show_all_children();
 
-    /*
-     * XXX:
-     * Make it possible to select between non-recursive (left to right) and
-     * recursive (top to bottom) algorithms.
-     * If the non-recursive algorithm is selected,
-     * make it possible to specify the number of solutions to find.
-     *
-     * XXX: Multi-threading
-     */
-    //solveProblemNonrecursively(100);
-    solveProblemRecursively();
+    // XXX: Multi-threading
+
+    if (shouldSolveRecursively)
+        solveProblemWithRecursion();
+    else
+        solveProblemWithBacktracking(numOfSolutionsToFind);
     std::cout << "Found " << m_solutionBoards.size() << " unique solution(s)" << std::endl;
 
     this->remove(*m_progressBar);
@@ -101,7 +96,7 @@ static bool isInSolutionList(const std::vector<std::shared_ptr<Board>>& solution
     return false;
 }
 
-void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
+void OutputWindowContent::solveProblemWithBacktracking(size_t maxSolutionNum)
 {
     std::shared_ptr<TreeNode> node = m_solutionTree;
     int boardSize{node->getBoard()->getSize()};
@@ -130,7 +125,7 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
 #if DEBUG_LOG
             std::cout << "Branch finished" << std::endl;
 #endif
-            if (!node->getParent()) // FIXME: This does not work 
+            if (!node->getParent())
             {
 #if DEBUG_LOG
                 std::cout << "Solved board" << std::endl;
@@ -162,9 +157,6 @@ void OutputWindowContent::solveProblemNonrecursively(int maxSolutionNum)
 #endif
                     m_solutionBoards.push_back(node->getBoard());
                 }
-                /*
-                 * FIXME: Endless loop if max number of solutions is not specified.
-                 */
                 if (m_solutionBoards.size() == (size_t)maxSolutionNum)
                     return;
                 assert(node->getParent()); // The root board can't be full
@@ -227,7 +219,7 @@ static void solveLevel(std::shared_ptr<TreeNode> node, std::vector<std::shared_p
 #endif
 }
 
-void OutputWindowContent::solveProblemRecursively()
+void OutputWindowContent::solveProblemWithRecursion()
 {
     solveLevel(m_solutionTree, m_solutionBoards);
 }

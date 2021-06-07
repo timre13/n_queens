@@ -22,9 +22,9 @@ private:
     std::unique_ptr<Gtk::Label> m_noSolutionsLabel;
 
 public:
-    OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget);
+    OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget, bool shouldSolveRecursively, size_t numOfSolutionsToFind);
 
-    void solveProblemNonrecursively(int maxSolutionNum);
-    void solveProblemRecursively();
+    void solveProblemWithBacktracking(size_t maxSolutionNum);
+    void solveProblemWithRecursion();
 };
 

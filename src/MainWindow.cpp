@@ -17,9 +17,13 @@ MainWindow::MainWindow()
 void MainWindow::onInputContentSolveButtonPressed()
 {
     this->remove(); // Clear the window
+
+    bool shouldSolveRecursively{m_inputContent->shouldSolveWithRecursion()};
+    size_t numOfSolutionsToFind{m_inputContent->findNumOfSolutions()};
     m_inputContent.reset();
 
-    m_outputContent = std::make_unique<OutputWindowContent>(m_boardWidget);
+    m_outputContent = std::make_unique<OutputWindowContent>(
+            m_boardWidget, shouldSolveRecursively, numOfSolutionsToFind);
     this->add(*m_outputContent); // Display the output screen
 
     show_all_children();
