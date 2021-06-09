@@ -14,11 +14,13 @@ class BoardWidget  final : public Gtk::DrawingArea
 {
 private:
     std::shared_ptr<Board> m_boardPtr;
+    bool m_shouldMarkUnusableFields{};
 
 public:
     BoardWidget(std::shared_ptr<Board> board);
 
     void setBoardPtr(std::shared_ptr<Board> board) { m_boardPtr = board; }
+    inline void setShouldMarkUnusableFields(bool value) { m_shouldMarkUnusableFields = value; }
 
     const std::shared_ptr<Board> getBoardPtr() const { return m_boardPtr; }
     std::shared_ptr<Board> getBoardPtr() { return m_boardPtr; }

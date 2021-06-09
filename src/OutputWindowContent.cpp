@@ -27,6 +27,8 @@ OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidge
 
     show_all_children();
 
+    m_boardWidget->setShouldMarkUnusableFields(false);
+
     // XXX: Multi-threading
 
     if (shouldSolveRecursively)

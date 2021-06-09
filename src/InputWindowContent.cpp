@@ -41,6 +41,7 @@ InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     //---------------------------- Board widget --------------------------------
 
     attach(*m_boardWidget, 1, 2);
+    m_boardWidget->setShouldMarkUnusableFields(true);
     m_boardWidget->set_margin_top(20);
     m_boardWidget->set_margin_bottom(20);
     m_boardWidget->add_events(Gdk::EventMask::BUTTON_PRESS_MASK | Gdk::EventMask::BUTTON_RELEASE_MASK);
