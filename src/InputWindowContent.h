@@ -35,11 +35,6 @@ public:
     inline bool shouldSolveWithRecursion() const { return m_algorithmChooserButton1->get_active(); }
     inline size_t findNumOfSolutions() const { return m_numOfSolutionsChooserSpinButton->get_value_as_int(); }
 
-    inline void onAlgorithmChooserButtonToggled()
-    {
-        m_numOfSolutionsChooserSpinButton->set_sensitive(m_algorithmChooserButton2->get_active());
-    }
-
     void onSpinButtonChanged();
     bool onCanvasClicked(GdkEventButton* button);
     void onSolveButtonPressed();

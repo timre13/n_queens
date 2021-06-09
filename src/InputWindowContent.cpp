@@ -59,21 +59,18 @@ InputWindowContent::InputWindowContent(std::shared_ptr<BoardWidget> boardWidget)
     m_algorithmChooserFrameGrid->attach(*m_algorithmChooserButton1, 0, 0);
     m_algorithmChooserButton1->set_group(radioButtonGroup);
     m_algorithmChooserButton1->set_label("Recursive");
-    m_algorithmChooserButton1->signal_toggled().connect(sigc::mem_fun(*this, &InputWindowContent::onAlgorithmChooserButtonToggled));
 
     m_algorithmChooserFrameGrid->attach(*m_algorithmChooserButton2, 0, 1);
     m_algorithmChooserButton2->join_group(*m_algorithmChooserButton1);
     m_algorithmChooserButton2->set_label("Backtracking");
-    m_algorithmChooserButton2->signal_toggled().connect(sigc::mem_fun(*this, &InputWindowContent::onAlgorithmChooserButtonToggled));
 
     m_algorithmChooserFrameGrid->attach(*m_numOfSolutionsChooserSpinButtonLabel, 0, 2);
-    m_numOfSolutionsChooserSpinButtonLabel->set_label("Max. solutions: ");
+    m_numOfSolutionsChooserSpinButtonLabel->set_label("Max. solutions (-1=ALL): ");
 
     m_algorithmChooserFrameGrid->attach(*m_numOfSolutionsChooserSpinButton, 1, 2);
     m_numOfSolutionsChooserSpinButton->set_range(-1, std::numeric_limits<double>::max());
     m_numOfSolutionsChooserSpinButton->set_increments(1, 1);
     m_numOfSolutionsChooserSpinButton->set_value(-1);
-    m_numOfSolutionsChooserSpinButton->set_sensitive(false);
 
     //----------------------------- Solve button -------------------------------
 

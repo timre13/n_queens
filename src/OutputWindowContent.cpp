@@ -30,7 +30,7 @@ OutputWindowContent::OutputWindowContent(std::shared_ptr<BoardWidget> boardWidge
     // XXX: Multi-threading
 
     if (shouldSolveRecursively)
-        solveProblemWithRecursion();
+        solveProblemWithRecursion(numOfSolutionsToFind);
     else
         solveProblemWithBacktracking(numOfSolutionsToFind);
     std::cout << "Found " << m_solutionBoards.size() << " unique solution(s)" << std::endl;
@@ -157,7 +157,7 @@ void OutputWindowContent::solveProblemWithBacktracking(size_t maxSolutionNum)
 #endif
                     m_solutionBoards.push_back(node->getBoard());
                 }
-                if (m_solutionBoards.size() == (size_t)maxSolutionNum)
+                if (m_solutionBoards.size() == maxSolutionNum)
                     return;
                 assert(node->getParent()); // The root board can't be full
                 node = node->getParent();
@@ -172,8 +172,11 @@ void OutputWindowContent::solveProblemWithBacktracking(size_t maxSolutionNum)
     //m_progressBar->pulse();
 }
 
-static void solveLevel(std::shared_ptr<TreeNode> node, std::vector<std::shared_ptr<Board>>& solutionBoards)
+static void solveLevel(std::shared_ptr<TreeNode> node, std::vector<std::shared_ptr<Board>>& solutionBoards, size_t maxSolutionNum)
 {
+    if (solutionBoards.size() == maxSolutionNum)
+        return;
+
 #if DEBUG_LOG
     std::cout << "Solving a level with " << node->getBoard()->getNumOfQueens() << " queens" << std::endl;
 #endif
@@ -212,15 +215,15 @@ static void solveLevel(std::shared_ptr<TreeNode> node, std::vector<std::shared_p
 #endif
 
     for (size_t i{}; i < node->getNumOfChildren(); ++i)
-        solveLevel(node->getChild(i), solutionBoards);
+        solveLevel(node->getChild(i), solutionBoards, maxSolutionNum);
 
 #if DEBUG_LOG
     std::cout << "End of child" << std::endl;
 #endif
 }
 
-void OutputWindowContent::solveProblemWithRecursion()
+void OutputWindowContent::solveProblemWithRecursion(size_t maxSolutionNum)
 {
-    solveLevel(m_solutionTree, m_solutionBoards);
+    solveLevel(m_solutionTree, m_solutionBoards, maxSolutionNum);
 }
 

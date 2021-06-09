@@ -25,6 +25,6 @@ public:
     OutputWindowContent(std::shared_ptr<BoardWidget> boardWidget, bool shouldSolveRecursively, size_t numOfSolutionsToFind);
 
     void solveProblemWithBacktracking(size_t maxSolutionNum);
-    void solveProblemWithRecursion();
+    void solveProblemWithRecursion(size_t maxSolutionNum);
 };
 
